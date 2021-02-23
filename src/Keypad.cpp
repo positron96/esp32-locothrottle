@@ -143,7 +143,7 @@ void Keypad::addEventListener(EventListener listener){
 
 void Keypad::transitionTo(uint8_t idx, KeyState nextState) {
     bitWrite( keysHeld, idx, (nextState==HOLD ? 1 : 0) );
-    bitWrite( keysPressed, idx, (nextState==PRESSED | nextState==HOLD) );
+    bitWrite( keysPressed, idx, ((nextState==PRESSED || nextState==HOLD) ? 1 : 0) );
 	
 	if ( keypadEventListener )  {
 		keypadEventListener(idx, nextState);
