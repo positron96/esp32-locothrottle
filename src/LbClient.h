@@ -18,7 +18,7 @@
 
 #ifdef LB_DEBUG
 #define LB_LOGI(format, ...)  do{ log_printf(ARDUHAL_LOG_FORMAT(I, format), ##__VA_ARGS__); }while(0)
-#define LB_LOGD(...)  
+#define LB_LOGD(format, ...)  do{ log_printf(ARDUHAL_LOG_FORMAT(D, format), ##__VA_ARGS__); }while(0)
 #else
 #define LB_LOGI(...)
 #define LB_LOGD(...) 
@@ -35,7 +35,7 @@ public:
     }
 
     void setServer(String host, uint16_t port) {
-        LB_LOGI("setServer: %s:%d", host.c_str(), port);
+        LB_LOGI("%s:%d", host.c_str(), port);
         this->host = host;
         this->port = port;
     }
@@ -73,11 +73,16 @@ public:
 
                                 //if(ret==LN_DONE) cli.println("SENT OK"); else
                                 //if(ret==LN_RETRY_ERROR) cli.println("SENT ERROR LN_RETRY_ERROR");
+                                break;
                             }
                         }
-                    }
+                    }           
+                } else if( strncmp("SENT", lbStr, 4)==0 ) {
+                    LB_LOGD("Sent result: %s", lbStr+4 );
+                } else if( strncmp("VERSION", lbStr, 7)==0 ) {
+                    LB_LOGD("Server version: %s", lbStr+7 );
                 } else {
-                    LB_LOGI("Got line but it's not SEND: %s", lbStr);
+                    LB_LOGI("Got unknown line: %s", lbStr);
                 }
                 lbPos=0;
             } else {
@@ -117,14 +122,15 @@ private:
 
     void sendMessage(const LnMsg &msg) {
         if(!cli) return;
+
         char ttt[LB_BUF_SIZE] = "SEND";
         uint t = strlen(ttt);
         uint8_t ln = msg.length();
         for(int j=0; j<ln; j++) {
             t += sprintf(ttt+t, " %02X", msg.data[j]);
         }
-        t += sprintf(ttt+t, "\n");
         LB_LOGD("Transmitting '%s'", ttt );
+        t += sprintf(ttt+t, "\n");
         cli.write(ttt);
     }
 
