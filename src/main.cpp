@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include <KeysReader.h>
 #include <Keypad.h>
 
 #include <U8g2lib.h>
@@ -7,6 +8,8 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiManager.h>
+
+#include <ESP32Encoder.h>
 
 
 // pins 2,7,6,4
@@ -18,12 +21,17 @@ const byte cols[] = { 27, 12, 25};
 const int colCount = sizeof(cols)/sizeof(cols[0]);
 
  
-Keypad numpad( rows, cols, rowCount, colCount );
+Keypad<rowCount,colCount> numpad( rows, cols );
+
+SimpleKeysReader<1> keys({4});
+
+ESP32Encoder encoder;
 
 U8G2_PCD8544_84X48_F_4W_SW_SPI u8g2(U8G2_R0, /* clock=*/ 16, /* data=*/ 17, /* cs=*/ 21, /* dc=*/ 18, /* reset=*/ 22); 
 //U8G2_PCD8544_84X48_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 4, /* dc=*/ 5, /* reset=*/ 3); 
 
 
+/*
 #include <LocoNet.h>
 #include <LocoNetThrottle.h>
 #include "LbClient.h"
@@ -31,9 +39,11 @@ LocoNetBus bus;
 LocoNetDispatcher parser(&bus);
 LocoNetThrottle thr(parser, 0,0,  ESP.getEfuseMac()&0xFFFF );
 LbClient client(bus);
+*/
 
 
 void keypadEventHandler(uint8_t key, KeyState st);
+void buttonEventHandler(uint8_t key, KeyState st);
 void criticalError(String err);
 void redraw();
 
@@ -45,8 +55,11 @@ void setup() {
     u8g2.setFontPosTop();
     u8g2.setFontMode(1);
 
-
     numpad.addEventListener(keypadEventHandler);
+    keys.addEventListener(buttonEventHandler);
+
+    ESP32Encoder::useInternalWeakPullResistors=UP;
+	encoder.attachHalfQuad(2,15);
 
     WiFiManager wifiManager;
     wifiManager.setConfigPortalTimeout(300); // 5 min
@@ -54,8 +67,8 @@ void setup() {
         criticalError("No WiFi");
 	}
 
+/*
     MDNS.begin("ESP32Throttle");
-	//MDNS.addService("http","tcp", DCCppServer_Port);
 	MDNS.setInstanceName("ESP32ThrottleInst");
 
     // hack: look for WiThrottle, but connect to LbServer
@@ -99,7 +112,7 @@ void setup() {
     });
 
     thr.setAddress(13);
-   
+*/
 
 }
 
@@ -123,8 +136,10 @@ void redraw() {
             KeyState st = numpad.getState(j*3+i);
             u8g2.drawGlyph(i*10, (j+1)*12, st==IDLE ? '.' : st==PRESSED ? 'P' : 'H');
         }*/
-    String t = "Addr: ";  t += thr.getAddress();
+    
+    String t = "Addr: ";  t += (int32_t)encoder.getCount();
     u8g2.drawStr(0, 2, t.c_str() );
+    /*
     u8g2.drawStr(0, 12, thr.getStateStr( thr.getState() ));
     t = thr.getDirection()==0 ? "F" : "B";
     t += thr.getSpeed();
@@ -135,7 +150,7 @@ void redraw() {
         if( thr.getFunction(i)!=0) t+= i;
     }
     u8g2.drawStr(0, 32, t.c_str() );
-
+*/
     u8g2.sendBuffer();
 }
 
@@ -143,7 +158,14 @@ void loop() {
     //static uint32_t frames=0;
     //static uint32_t lastOutptTime=0;
     numpad.getKeys();
-    client.loop();
+    keys.getKeys();
+    static int32_t enc;
+    if(enc!=encoder.getCount() ) {
+        enc = encoder.getCount();
+        Serial.printf("%d\n", enc);
+        redraw();
+    }
+    //client.loop();
     /*frames++;
     if( (millis() - lastOutptTime)>1000) {
         lastOutptTime = millis();
@@ -171,7 +193,7 @@ void keypadEventHandler(uint8_t key, KeyState st) {
 
     if(st==IDLE) {
         switch(key) {
-            case KEY_STAR:
+            /*case KEY_STAR:
                 thr.setAddress(13);
                 break;
             case KEY_DASH: 
@@ -188,8 +210,13 @@ void keypadEventHandler(uint8_t key, KeyState st) {
 
             case KEY_7: requestSwitch(&bus, 10, 1, 1); break;
             case KEY_8: requestSwitch(&bus, 10, 0, 1); break;
-            default: break;
+            default: break;*/
         }
     }
 } 
 
+
+
+void buttonEventHandler(uint8_t key, KeyState st) {    
+    Serial.printf("Evt %d state %d\n", key, (int)st);
+}
