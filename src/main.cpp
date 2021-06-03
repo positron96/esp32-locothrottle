@@ -9,7 +9,7 @@
 #include <ESPmDNS.h>
 #include <WiFiManager.h>
 
-#include <ESP32Encoder.h>
+#include <Encoder.h>
 
 
 // pins 2,7,6,4
@@ -25,7 +25,7 @@ Keypad<rowCount,colCount> numpad( rows, cols );
 
 SimpleKeysReader<1> keys({4});
 
-ESP32Encoder encoder;
+Encoder encoder{2,15};
 
 U8G2_PCD8544_84X48_F_4W_SW_SPI u8g2(U8G2_R0, /* clock=*/ 16, /* data=*/ 17, /* cs=*/ 21, /* dc=*/ 18, /* reset=*/ 22); 
 //U8G2_PCD8544_84X48_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 4, /* dc=*/ 5, /* reset=*/ 3); 
@@ -57,9 +57,7 @@ void setup() {
 
     numpad.addEventListener(keypadEventHandler);
     keys.addEventListener(buttonEventHandler);
-
-    ESP32Encoder::useInternalWeakPullResistors=UP;
-	encoder.attachHalfQuad(2,15);
+    encoder.start();
 
     WiFiManager wifiManager;
     wifiManager.setConfigPortalTimeout(300); // 5 min
@@ -112,7 +110,8 @@ void setup() {
     });
 
     thr.setAddress(13);
-*/
+    */
+
 
 }
 
@@ -188,7 +187,7 @@ constexpr uint8_t KEY_0 = 10;
 constexpr uint8_t KEY_DASH = 11;
 
 void keypadEventHandler(uint8_t key, KeyState st) {    
-    //Serial.printf("%d - %s\n", key, st==IDLE?"IDLE": st==PRESSED?"PRESSED":"HOLD" );
+    Serial.printf("Keypad %d - %s\n", key, st==IDLE?"IDLE": st==PRESSED?"PRESSED":"HOLD" );
     //redraw();
 
     if(st==IDLE) {
@@ -218,5 +217,5 @@ void keypadEventHandler(uint8_t key, KeyState st) {
 
 
 void buttonEventHandler(uint8_t key, KeyState st) {    
-    Serial.printf("Evt %d state %d\n", key, (int)st);
+    Serial.printf("Key %d state %d\n", key, (int)st);
 }
