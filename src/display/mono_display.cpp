@@ -38,7 +38,7 @@ constexpr uint32_t STRIDE = (WIDTH + 7) / 8;
 
 alignas(4) uint8_t draw_buffer[I1_PALETTE_BYTES + STRIDE * HEIGHT];
 
-lv_style_t style_no_anim;
+//lv_style_t style_no_anim;
 lv_theme_t * theme = nullptr;
 
 uint32_t tick_cb() {
@@ -91,21 +91,21 @@ void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map) {
 }
 
 void theme_apply_cb(lv_theme_t *, lv_obj_t * obj) {
-    lv_obj_add_style(obj, &style_no_anim, 0);
+    //lv_obj_add_style(obj, &style_no_anim, 0);
 }
 
 void init_theme() {
-    lv_style_init(&style_no_anim);
-    lv_style_set_anim_duration(&style_no_anim, 0);
+    //lv_style_init(&style_no_anim);
+    //lv_style_set_anim_duration(&style_no_anim, 0);
 
     lv_theme_t * mono = lv_theme_mono_init(lv_disp, /*dark_bg=*/true, LV_FONT_DEFAULT);
 
     // Chain a theme on top of the mono theme that zeroes the animation time of every widget.
-    theme = lv_theme_create();
-    lv_theme_copy(theme, mono);
-    lv_theme_set_parent(theme, mono);
-    lv_theme_set_apply_cb(theme, theme_apply_cb);
-    lv_display_set_theme(lv_disp, theme);
+    // theme = lv_theme_create();
+    // lv_theme_copy(theme, mono);
+    // lv_theme_set_parent(theme, mono);
+    // lv_theme_set_apply_cb(theme, theme_apply_cb);
+    lv_display_set_theme(lv_disp, mono);
 }
 
 bool panel_responds() {

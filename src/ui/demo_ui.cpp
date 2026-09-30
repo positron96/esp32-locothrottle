@@ -167,7 +167,7 @@ void cycle_cb(lv_timer_t *) {
         highlight_menu_row(menu_selection);
     }
     // No animation: the panel has no gray levels to make a transition look good.
-    lv_screen_load(screens[active_screen]);
+    lv_screen_load_anim(screens[active_screen], LV_SCREEN_LOAD_ANIM_OVER_LEFT, 500, 0, false);
 }
 
 }  // namespace
