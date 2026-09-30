@@ -10,5 +10,9 @@ public:
     AppState update(AppState current) override;
 
 private:
+    void build();
+
     unsigned long enteredAtMs_ = 0;
+    bool built_ = false;
+    lv_obj_t* statusLabel_ = nullptr;
 };

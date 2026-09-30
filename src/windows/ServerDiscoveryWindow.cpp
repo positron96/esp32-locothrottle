@@ -5,11 +5,23 @@
 ServerDiscoveryWindow::ServerDiscoveryWindow(ServerDiscovery& discovery, DiscoveredServer& selectedServer)
     : discovery_(discovery), selectedServer_(selectedServer) {}
 
+void ServerDiscoveryWindow::build() {
+    statusLabel_ = lv_label_create(screen_);
+    lv_obj_center(statusLabel_);
+}
+
 void ServerDiscoveryWindow::onEnter() {
+    loadScreen();
+    if (!built_) {
+        build();
+        built_ = true;
+    }
+
     hasSelection_ = false;
     resultsPrinted_ = false;
     servers_.clear();
 
+    lv_label_set_text(statusLabel_, "Scanning for\nWiThrottle servers...");
     Serial.println(F("[Discovery] Scanning for WiThrottle servers... (type 'c' + Enter to cancel)"));
     discovery_.begin();
 }
@@ -17,10 +29,12 @@ void ServerDiscoveryWindow::onEnter() {
 void ServerDiscoveryWindow::printResults() {
     if (servers_.empty()) {
         Serial.println(F("[Discovery] No servers found"));
+        lv_label_set_text(statusLabel_, "No servers found");
         return;
     }
 
     Serial.println(F("[Discovery] Servers found:"));
+    lv_label_set_text_fmt(statusLabel_, "%u server(s) found\nuse Serial to select", servers_.size());
     for (size_t i = 0; i < servers_.size(); ++i) {
         Serial.printf("  [%u] %s (%s:%u)\n", static_cast<unsigned>(i), servers_[i].name.c_str(),
                        servers_[i].ip.toString().c_str(), servers_[i].port);

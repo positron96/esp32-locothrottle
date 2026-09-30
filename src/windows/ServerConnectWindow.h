@@ -20,9 +20,13 @@ public:
     AppState update(AppState current) override;
 
 private:
+    void build();
+
     static constexpr int32_t CONNECT_TIMEOUT_MS = 5000;
 
     const DiscoveredServer& selectedServer_;
     WiFiClient& serverLink_;
     bool connected_ = false;
+    bool built_ = false;
+    lv_obj_t* statusLabel_ = nullptr;
 };

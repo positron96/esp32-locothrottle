@@ -15,6 +15,10 @@ public:
     AppState update(AppState current) override;
 
 private:
+    void build();
+
     WiFiSetup& wifiSetup_;
     bool portalAnnounced_ = false;
+    bool built_ = false;
+    lv_obj_t* statusLabel_ = nullptr;
 };

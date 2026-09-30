@@ -5,9 +5,22 @@
 ServerConnectWindow::ServerConnectWindow(const DiscoveredServer& selectedServer, WiFiClient& serverLink)
     : selectedServer_(selectedServer), serverLink_(serverLink) {}
 
+void ServerConnectWindow::build() {
+    statusLabel_ = lv_label_create(screen_);
+    lv_obj_center(statusLabel_);
+}
+
 void ServerConnectWindow::onEnter() {
+    loadScreen();
+    if (!built_) {
+        build();
+        built_ = true;
+    }
+
     Serial.printf("[Connect] Connecting to %s:%u...\n", selectedServer_.ip.toString().c_str(),
                   selectedServer_.port);
+    lv_label_set_text_fmt(statusLabel_, "Connecting to\n%s:%u...", selectedServer_.ip.toString().c_str(),
+                          selectedServer_.port);
 
     // Bounded, short blocking check: this is a much shorter, deterministic
     // wait than the WiFi connection step, so it isn't worth the complexity
@@ -17,6 +30,7 @@ void ServerConnectWindow::onEnter() {
 
     Serial.println(connected_ ? F("[Connect] Reachable (protocol not implemented yet)")
                                : F("[Connect] Failed to connect"));
+    lv_label_set_text(statusLabel_, connected_ ? "Reachable" : "Failed to connect");
 }
 
 AppState ServerConnectWindow::update(AppState current) {

@@ -26,6 +26,13 @@ public:
     AppState update(AppState current) override;
 
 private:
+    void build();
+    static void exitClickedHandler(lv_event_t* e);
+
     ThrottleInputs& inputs_;
     WiFiClient& serverLink_;
+    bool built_ = false;
+    bool quitRequested_ = false;
+    lv_obj_t* statusLabel_ = nullptr;
+    lv_obj_t* exitButton_ = nullptr;
 };

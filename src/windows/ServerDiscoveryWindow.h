@@ -17,6 +17,7 @@ public:
     AppState update(AppState current) override;
 
 private:
+    void build();
     void printResults();
 
     ServerDiscovery& discovery_;
@@ -24,4 +25,6 @@ private:
     DiscoveredServerList servers_;
     bool resultsPrinted_ = false;
     bool hasSelection_ = false;
+    bool built_ = false;
+    lv_obj_t* statusLabel_ = nullptr;
 };
