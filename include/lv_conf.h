@@ -139,7 +139,7 @@
  *  - LV_COLOR_FORMAT_ARGB8888
  *  - LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
  */
-#define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_RGB565
+#define LV_COLOR_FORMAT_DEFAULT LV_COLOR_FORMAT_I1
 
 /** 0: no adjustment, get the integer part of the result (round down)
  *  64: round up from x.75
@@ -228,33 +228,33 @@
 
 #if LV_USE_DRAW_SW
 /** RGB565 */
-#define LV_DRAW_SW_SUPPORT_RGB565 1
+#define LV_DRAW_SW_SUPPORT_RGB565 0
 
 /** RGB565 swapped */
-#define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 1
+#define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 0
 
 /** RGB565A8 */
-#define LV_DRAW_SW_SUPPORT_RGB565A8 1
+#define LV_DRAW_SW_SUPPORT_RGB565A8 0
 
 /** RGB888 */
-#define LV_DRAW_SW_SUPPORT_RGB888 1
+#define LV_DRAW_SW_SUPPORT_RGB888 0
 
 /** XRGB8888 */
-#define LV_DRAW_SW_SUPPORT_XRGB8888 1
+#define LV_DRAW_SW_SUPPORT_XRGB8888 0
 
-/** ARGB8888 */
+/** ARGB8888: required for the intermediate layers LVGL creates when an area needs alpha. */
 #define LV_DRAW_SW_SUPPORT_ARGB8888 1
 
 /** ARGB8888 premultiplied */
-#define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
+#define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 0
 
 /** L8 */
-#define LV_DRAW_SW_SUPPORT_L8 1
+#define LV_DRAW_SW_SUPPORT_L8 0
 
 /** AL88 */
-#define LV_DRAW_SW_SUPPORT_AL88 1
+#define LV_DRAW_SW_SUPPORT_AL88 0
 
-/** A8 */
+/** A8: required for mask rendering. */
 #define LV_DRAW_SW_SUPPORT_A8 1
 
 /** I1 */
@@ -281,7 +281,7 @@
 /** Adds rounded corners, shadows, skewed lines and arcs.
  *  Without it only rectangles with gradients, images, texts and straight lines can be drawn.
  */
-#define LV_DRAW_SW_COMPLEX 1
+#define LV_DRAW_SW_COMPLEX 0
 
 /** Each additional stop costs (sizeof(lv_color_t) + 1) bytes. */
 #define LV_GRADIENT_MAX_STOPS 2
@@ -775,7 +775,7 @@
 #define LV_USE_FLOAT 0
 
 /** Bind widgets to subject variables so they update automatically when the value changes. */
-#define LV_USE_OBSERVER 1
+#define LV_USE_OBSERVER 0
 
 /** Look up strings by ID for the selected language with lv_translation_get(). */
 #define LV_USE_TRANSLATION 0
@@ -863,7 +863,7 @@
 #endif /*LV_USE_THEME_DEFAULT*/
 
 /** Minimal styling, a good starting point for a custom theme. */
-#define LV_USE_THEME_SIMPLE 1
+#define LV_USE_THEME_SIMPLE 0
 
 /** Styling for 1-bit displays such as e-paper and dot-matrix panels. */
 #define LV_USE_THEME_MONO 1
@@ -875,10 +875,10 @@
  *============================================================================*/
 
 /** Arrange children in a row or column that wraps and grows, similar to Flexbox in CSS. */
-#define LV_USE_FLEX 1
+#define LV_USE_FLEX 0
 
 /** Arrange children in rows and columns, similar to Grid in CSS. */
-#define LV_USE_GRID 1
+#define LV_USE_GRID 0
 
 
 
