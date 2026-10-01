@@ -4,6 +4,7 @@
 
 #include "AppState.h"
 #include "AppStateMachine.h"
+#include "inputs/QuadratureEncoderInput.h"
 #include "inputs/SerialThrottleInputs.h"
 #include "network/ServerDiscovery.h"
 #include "network/WiFiSetup.h"
@@ -49,6 +50,7 @@ WiFiSetup wifiSetup;
 ServerDiscovery serverDiscovery;
 DiscoveredServer selectedServer;
 SerialThrottleInputs throttleInputs;
+QuadratureEncoderInput encoderInput;
 WiFiClient serverLink;
 
 WifiConnectWindow wifiConnectWindow(wifiSetup);
@@ -67,6 +69,8 @@ void setup() {
     Serial.println("Starting WiThRemote");
 
     lvglInit();
+    encoderInput.begin();
+    encoderInput.register_lvgl_indev();
     lastTickMs = millis();
 
     stateMachine.begin();
