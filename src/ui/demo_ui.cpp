@@ -17,6 +17,7 @@ struct Widgets {
     lv_obj_t * splash_bar;
     lv_obj_t * splash_hint;
     lv_obj_t * speed_value;
+    lv_obj_t * speed_unit;
     lv_obj_t * speed_bar;
     lv_obj_t * direction;
     lv_obj_t * menu_rows[MENU_ITEM_CNT];
@@ -93,9 +94,9 @@ lv_obj_t * build_throttle_screen() {
     lv_label_set_text(widgets.speed_value, "0");
     lv_obj_align(widgets.speed_value, LV_ALIGN_LEFT_MID, 8, 0);
 
-    lv_obj_t * unit = lv_label_create(scr);
-    lv_label_set_text(unit, "%");
-    lv_obj_align_to(unit, widgets.speed_value, LV_ALIGN_OUT_RIGHT_BOTTOM, 2, 0);
+    widgets.speed_unit = lv_label_create(scr);
+    lv_label_set_text(widgets.speed_unit, "%");
+    lv_obj_align_to(widgets.speed_unit, widgets.speed_value, LV_ALIGN_OUT_RIGHT_BOTTOM, 2, 0);
 
     widgets.direction = lv_label_create(scr);
     lv_label_set_text(widgets.direction, "FWD >>");
@@ -157,6 +158,7 @@ void update_cb(lv_timer_t *) {
         lv_label_set_text(widgets.direction, speed_step > 0 ? "FWD >>" : "<< REV");
     }
     lv_label_set_text_fmt(widgets.speed_value, "%d", static_cast<int>(speed));
+    lv_obj_align_to(widgets.speed_unit, widgets.speed_value, LV_ALIGN_OUT_RIGHT_BOTTOM, 2, 0);
     lv_bar_set_value(widgets.speed_bar, speed, LV_ANIM_OFF);
 }
 

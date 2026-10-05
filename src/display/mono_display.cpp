@@ -18,8 +18,21 @@ namespace {
 
 // Full frame buffer panel driver. Swapping this type (and the constructor arguments)
 // is enough to move the whole UI to another U8g2-supported monochrome panel.
-using Panel = U8G2_SSD1306_128X64_NONAME_F_HW_I2C;
-Panel panel(U8G2_R0, /*reset=*/U8X8_PIN_NONE, /*clock=*/pins::I2C_SCL, /*data=*/pins::I2C_SDA);
+
+// using Panel = U8G2_SSD1306_128X64_NONAME_F_HW_I2C;
+// Panel panel(U8G2_R0, /*reset=*/U8X8_PIN_NONE, /*clock=*/pins::I2C_SCL, /*data=*/pins::I2C_SDA);
+
+
+// nokia 5110
+//U8G2_PCD8544_84X48_F_4W_HW_SPI u8g2(U8G2_R0,
+//  /* cs=*/ 10,
+//  /* dc=*/ 9,
+//  /* reset=*/ 8);
+
+// GMG12864
+using Panel = U8G2_ST7565_64128N_F_4W_HW_SPI ;
+Panel panel(U8G2_R0, /*CS=*/5, /*DC=*/17, /*RST=*/16);
+// do   u8g2.setContrast(180);
 
 lv_display_t * lv_disp = nullptr;
 
@@ -116,12 +129,12 @@ bool panel_responds() {
 }  // namespace
 
 bool begin() {
-    Wire.begin(pins::I2C_SDA, pins::I2C_SCL, pins::I2C_FREQUENCY);
-    if(!panel_responds()) return false;
-
-    panel.setI2CAddress(pins::OLED_I2C_ADDRESS << 1);
-    panel.setBusClock(pins::I2C_FREQUENCY);
+    // Wire.begin(pins::I2C_SDA, pins::I2C_SCL, pins::I2C_FREQUENCY);
+    // if(!panel_responds()) return false;
+    // panel.setI2CAddress(pins::OLED_I2C_ADDRESS << 1);
+    // panel.setBusClock(pins::I2C_FREQUENCY);
     panel.begin();
+    panel.setContrast(180);
     panel.clearBuffer();
     panel.sendBuffer();
 
