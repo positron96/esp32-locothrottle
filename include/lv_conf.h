@@ -1101,6 +1101,15 @@
 
 #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(u8g2_font_nokiafc22_tf)
 
+/* Nokia has no FontAwesome glyphs. Keep action labels distinct from text keys. */
+#define LV_SYMBOL_BACKSPACE "BS"
+#define LV_SYMBOL_NEW_LINE "Ent"
+#define LV_SYMBOL_LEFT "<<"
+#define LV_SYMBOL_RIGHT ">>"
+#define LV_SYMBOL_OK "OK"
+#define LV_SYMBOL_CLOSE "Esc"
+#define LV_SYMBOL_KEYBOARD "Esc"
+
 /** Enable this to set LV_FONT_DEFAULT to a font you define yourself
  *  rather than one of the built-in fonts below. When enabled, the
  *  built-in default-font selection is hidden, so you MUST define

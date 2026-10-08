@@ -18,18 +18,6 @@ namespace ui {
         lv_obj_add_style(button, &border_style, 0);
     }
 
-    inline void apply_keyboard_button_border(lv_obj_t* keyboard) {
-        static lv_style_t border_style;
-        static bool initialized = false;
-        if (!initialized) {
-            lv_style_init(&border_style);
-            lv_style_set_border_width(&border_style, 1);
-            lv_style_set_border_color(&border_style, lv_color_white());
-            initialized = true;
-        }
-        lv_obj_add_style(keyboard, &border_style, LV_PART_ITEMS);
-    }
-
     class ScreenManager {
     public:
         void init();

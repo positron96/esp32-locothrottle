@@ -15,27 +15,9 @@ namespace ui {
             lv_obj_clear_flag(root, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_style_pad_all(root, 0, 0);
 
-            back_button_ = lv_button_create(root);
-            apply_button_border(back_button_);
-            lv_obj_set_pos(back_button_, 0, 0);
-            lv_obj_set_size(back_button_, 42, 18);
-            lv_obj_t* back_label = lv_label_create(back_button_);
-            lv_label_set_text(back_label, "Back");
-            lv_obj_center(back_label);
-            lv_obj_add_event_cb(back_button_, back_button_event_callback, LV_EVENT_CLICKED, this);
-
-            ok_button_ = lv_button_create(root);
-            apply_button_border(ok_button_);
-            lv_obj_set_pos(ok_button_, 86, 0);
-            lv_obj_set_size(ok_button_, 42, 18);
-            lv_obj_t* ok_label = lv_label_create(ok_button_);
-            lv_label_set_text(ok_label, "OK");
-            lv_obj_center(ok_label);
-            lv_obj_add_event_cb(ok_button_, ok_button_event_callback, LV_EVENT_CLICKED, this);
-
             password_textarea_ = lv_textarea_create(root);
-            lv_obj_set_pos(password_textarea_, 44, 0);
-            lv_obj_set_size(password_textarea_, 42, 18);
+            lv_obj_set_pos(password_textarea_, 0, 0);
+            lv_obj_set_size(password_textarea_, 128, 18);
             lv_textarea_set_password_mode(password_textarea_, true);
             lv_textarea_set_one_line(password_textarea_, true);
 
@@ -46,13 +28,9 @@ namespace ui {
             lv_obj_set_style_pad_all(keyboard_, 0, 0);
             lv_obj_set_style_pad_gap(keyboard_, 0, 0);
             lv_obj_set_style_pad_all(keyboard_, 0, LV_PART_ITEMS);
-            lv_obj_set_style_text_font(keyboard_, &u8g2_font_nokiafc22_tf, LV_PART_ITEMS);
-            apply_keyboard_button_border(keyboard_);
             lv_keyboard_set_textarea(keyboard_, password_textarea_);
-
-            create_keyboard_action_button("BS", 110, 18, backspace_button_event_callback);
-            create_keyboard_action_button("<", 18, 52, cursor_left_button_event_callback);
-            create_keyboard_action_button(">", 90, 52, cursor_right_button_event_callback);
+            lv_obj_add_event_cb(keyboard_, keyboard_event_callback, LV_EVENT_READY, this);
+            lv_obj_add_event_cb(keyboard_, keyboard_event_callback, LV_EVENT_CANCEL, this);
         }
 
         void on_show() override {
@@ -67,73 +45,22 @@ namespace ui {
 
     private:
         Screen* back_screen_ = nullptr;
-        lv_obj_t* back_button_ = nullptr;
-        lv_obj_t* ok_button_ = nullptr;
         lv_obj_t* password_textarea_ = nullptr;
         lv_obj_t* keyboard_ = nullptr;
         String network_name_;
 
-        using keyboard_action_callback_t = void (*)(lv_event_t*);
-
-        void create_keyboard_action_button(
-            const char* text,
-            int32_t x,
-            int32_t y,
-            keyboard_action_callback_t callback) {
-            lv_obj_t* button = lv_btn_create(root);
-            apply_button_border(button);
-            lv_obj_set_pos(button, x, y);
-            lv_obj_set_size(button, 18, 12);
-            lv_obj_set_style_pad_all(button, 0, 0);
-            lv_obj_set_style_text_font(button, &u8g2_font_nokiafc22_tf, 0);
-            lv_obj_t* label = lv_label_create(button);
-            lv_label_set_text(label, text);
-            lv_obj_center(label);
-            lv_obj_add_event_cb(button, callback, LV_EVENT_CLICKED, this);
-        }
-
-        static void backspace_button_event_callback(lv_event_t* event) {
-            if (lv_event_get_code(event) != LV_EVENT_CLICKED) {
+        static void keyboard_event_callback(lv_event_t* event) {
+            const lv_event_code_t code = lv_event_get_code(event);
+            if (code != LV_EVENT_READY && code != LV_EVENT_CANCEL) {
                 return;
             }
 
             auto* screen = static_cast<WiFiPasswordScreen*>(lv_event_get_user_data(event));
-            lv_textarea_delete_char(screen->password_textarea_);
-        }
-
-        static void cursor_left_button_event_callback(lv_event_t* event) {
-            if (lv_event_get_code(event) != LV_EVENT_CLICKED) {
-                return;
+            if (code == LV_EVENT_READY) {
+                WiFi.begin(
+                    screen->network_name_.c_str(),
+                    lv_textarea_get_text(screen->password_textarea_));
             }
-
-            auto* screen = static_cast<WiFiPasswordScreen*>(lv_event_get_user_data(event));
-            lv_textarea_cursor_left(screen->password_textarea_);
-        }
-
-        static void cursor_right_button_event_callback(lv_event_t* event) {
-            if (lv_event_get_code(event) != LV_EVENT_CLICKED) {
-                return;
-            }
-
-            auto* screen = static_cast<WiFiPasswordScreen*>(lv_event_get_user_data(event));
-            lv_textarea_cursor_right(screen->password_textarea_);
-        }
-
-        static void back_button_event_callback(lv_event_t* event) {
-            if (lv_event_get_code(event) != LV_EVENT_CLICKED) {
-                return;
-            }
-
-            auto* screen = static_cast<WiFiPasswordScreen*>(lv_event_get_user_data(event));
-            ScreenManager::instance().set_screen(screen->back_screen_);
-        }
-
-        static void ok_button_event_callback(lv_event_t* event) {
-            if (lv_event_get_code(event) != LV_EVENT_CLICKED) {
-                return;
-            }
-
-            auto* screen = static_cast<WiFiPasswordScreen*>(lv_event_get_user_data(event));
             ScreenManager::instance().set_screen(screen->back_screen_);
         }
     };
