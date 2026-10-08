@@ -23,13 +23,13 @@ namespace ui {
             lv_obj_clear_flag(root, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_style_pad_all(root, 0, 0);
 
-            back_button_ = create_button("Back", 0, 0, 42, 18, back_button_event_callback);
-            scan_button_ = create_button("Scan", 43, 0, 42, 18, scan_button_event_callback);
-            manual_button_ = create_button("Manual", 86, 0, 42, 18, manual_button_event_callback);
+            back_button_ = create_button("Back", 0, 0, 42, back_button_event_callback);
+            scan_button_ = create_button("Scan", 43, 0, 42, scan_button_event_callback);
+            manual_button_ = create_button("Manual", 86, 0, 42, manual_button_event_callback);
 
             list_container_ = lv_obj_create(root);
-            lv_obj_set_pos(list_container_, 0, 20);
-            lv_obj_set_size(list_container_, 128, 44);
+            lv_obj_set_pos(list_container_, 0, 12);
+            lv_obj_set_size(list_container_, 128, 52);
             lv_obj_set_scroll_dir(list_container_, LV_DIR_VER);
         }
 
@@ -54,6 +54,7 @@ namespace ui {
 
     private:
         static constexpr uint32_t scan_timer_period_ms = 100;
+        static constexpr int32_t list_row_height = 10;
 
         Screen* back_screen_ = nullptr;
         lv_obj_t* back_button_ = nullptr;
@@ -77,12 +78,11 @@ namespace ui {
             int32_t x,
             int32_t y,
             int32_t width,
-            int32_t height,
             button_callback_t callback) {
             lv_obj_t* button = lv_button_create(root);
             apply_button_border(button);
             lv_obj_set_pos(button, x, y);
-            lv_obj_set_size(button, width, height);
+            lv_obj_set_width(button, width);
             lv_obj_t* label = lv_label_create(button);
             lv_label_set_text(label, text);
             lv_obj_center(label);
@@ -93,8 +93,8 @@ namespace ui {
         void add_server_row(const char* text, uint32_t index, button_callback_t callback = nullptr) {
             lv_obj_t* button = lv_button_create(list_container_);
             apply_button_border(button);
-            lv_obj_set_pos(button, 0, static_cast<int32_t>(index * 18));
-            lv_obj_set_size(button, 128, 18);
+            lv_obj_set_pos(button, 0, static_cast<int32_t>(index * list_row_height));
+            lv_obj_set_size(button, 128, list_row_height);
             lv_obj_t* label = lv_label_create(button);
             lv_label_set_text(label, text);
             lv_obj_center(label);

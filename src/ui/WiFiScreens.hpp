@@ -78,15 +78,15 @@ namespace ui {
             back_button_ = lv_button_create(root);
             apply_button_border(back_button_);
             lv_obj_set_pos(back_button_, 0, 0);
-            lv_obj_set_size(back_button_, 42, 18);
+            lv_obj_set_width(back_button_, 42);
             lv_obj_t* back_label = lv_label_create(back_button_);
             lv_label_set_text(back_label, "Back");
             lv_obj_center(back_label);
             lv_obj_add_event_cb(back_button_, back_button_event_callback, LV_EVENT_CLICKED, this);
 
             network_container_ = lv_obj_create(root);
-            lv_obj_set_pos(network_container_, 0, 20);
-            lv_obj_set_size(network_container_, 128, 44);
+            lv_obj_set_pos(network_container_, 0, 12);
+            lv_obj_set_size(network_container_, 128, 52);
             lv_obj_set_scroll_dir(network_container_, LV_DIR_VER);
         }
 
@@ -100,6 +100,8 @@ namespace ui {
         }
 
     private:
+        static constexpr int32_t network_row_height = 10;
+
         Screen* back_screen_ = nullptr;
         WiFiPasswordScreen password_screen_;
         lv_obj_t* back_button_ = nullptr;
@@ -173,8 +175,11 @@ namespace ui {
         void add_network_row(const char* network_name) {
             lv_obj_t* network_button = lv_btn_create(network_container_);
             apply_button_border(network_button);
-            lv_obj_set_pos(network_button, 0, static_cast<int32_t>(network_row_count_ * 18));
-            lv_obj_set_size(network_button, 128, 18);
+            lv_obj_set_pos(
+                network_button,
+                0,
+                static_cast<int32_t>(network_row_count_ * network_row_height));
+            lv_obj_set_size(network_button, 128, network_row_height);
             lv_obj_t* network_label = lv_label_create(network_button);
             lv_label_set_text(network_label, network_name);
             lv_obj_center(network_label);
