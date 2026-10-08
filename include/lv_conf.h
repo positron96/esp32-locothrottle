@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.6.0
+ * Configuration file for v9.5.0
  */
 
 /*
@@ -1001,16 +1001,16 @@
 /** Montserrat fonts with ASCII range and some symbols using bpp = 4
  *  https://fonts.google.com/specimen/Montserrat
  */
-#define LV_FONT_MONTSERRAT_8 0
+#define LV_FONT_MONTSERRAT_8 1
 
 /** Montserrat 10 */
-#define LV_FONT_MONTSERRAT_10 0
+#define LV_FONT_MONTSERRAT_10 1
 
 /** Montserrat 12 */
 #define LV_FONT_MONTSERRAT_12 0
 
 /** Montserrat 14 */
-#define LV_FONT_MONTSERRAT_14 1
+#define LV_FONT_MONTSERRAT_14 0
 
 /** Montserrat 16 */
 #define LV_FONT_MONTSERRAT_16 0
@@ -1099,6 +1099,8 @@
 
 #endif /*LV_FONT_USE_CUSTOM_INCLUDE*/
 
+#define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(u8g2_font_nokiafc22_tf)
+
 /** Enable this to set LV_FONT_DEFAULT to a font you define yourself
  *  rather than one of the built-in fonts below. When enabled, the
  *  built-in default-font selection is hidden, so you MUST define
@@ -1111,7 +1113,9 @@
  *  If you do not, LV_FONT_DEFAULT falls back to a builtin font,
  *  which is no longer compiled in, causing a link error.
  */
-#define LV_USE_CUSTOM_FONT_DEFAULT 0
+#define LV_USE_CUSTOM_FONT_DEFAULT 1
+
+#define LV_FONT_DEFAULT &u8g2_font_nokiafc22_tf
 
 #if !LV_USE_CUSTOM_FONT_DEFAULT
 /** Font used by the themes and by widgets that do not set one explicitly.
@@ -1144,7 +1148,7 @@
  *  - LV_FONT_DEFAULT_UNSCII_8 (enable: LV_FONT_UNSCII_8)
  *  - LV_FONT_DEFAULT_UNSCII_16 (enable: LV_FONT_UNSCII_16)
  */
-#define LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_14
+#define LV_FONT_DEFAULT &u8g2_font_nokiafc22_tf
 
 #endif /*!LV_USE_CUSTOM_FONT_DEFAULT*/
 

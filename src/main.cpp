@@ -3,16 +3,12 @@
 #include <lvgl.h>
 
 #include "AppState.h"
-#include "AppStateMachine.h"
+
 #include "inputs/QuadratureEncoderInput.h"
 #include "inputs/SerialThrottleInputs.h"
 #include "network/ServerDiscovery.h"
 #include "network/WiFiSetup.h"
-#include "windows/ErrorWindow.h"
-#include "windows/MainControlWindow.h"
-#include "windows/ServerConnectWindow.h"
-#include "windows/ServerDiscoveryWindow.h"
-#include "windows/WifiConnectWindow.h"
+
 
 namespace {
 
@@ -46,21 +42,7 @@ void lvglTick() {
     lv_timer_handler();
 }
 
-WiFiSetup wifiSetup;
-ServerDiscovery serverDiscovery;
-DiscoveredServer selectedServer;
-SerialThrottleInputs throttleInputs;
 QuadratureEncoderInput encoderInput;
-WiFiClient serverLink;
-
-WifiConnectWindow wifiConnectWindow(wifiSetup);
-ServerDiscoveryWindow serverDiscoveryWindow(serverDiscovery, selectedServer);
-ServerConnectWindow serverConnectWindow(selectedServer, serverLink);
-MainControlWindow mainControlWindow(throttleInputs, serverLink);
-ErrorWindow errorWindow;
-
-AppStateMachine stateMachine(AppState::WifiConnecting, wifiConnectWindow, serverDiscoveryWindow, serverConnectWindow,
-                             mainControlWindow, errorWindow);
 
 } // namespace
 
@@ -73,10 +55,9 @@ void setup() {
     encoderInput.register_lvgl_indev();
     lastTickMs = millis();
 
-    stateMachine.begin();
 }
 
 void loop() {
     lvglTick();
-    stateMachine.update();
+
 }

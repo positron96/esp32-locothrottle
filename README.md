@@ -20,7 +20,8 @@ Operation:
      - Potentially: allow to connect to wifi with display and buttons (with LVGL on-screen keyboard for password)
  - After connecting to WiFi, scans mDNS for WiThrottle servers, shows the list and allows user to choose.
    (similar to EngineDriver phone app)
-      - Potentially: allow to enter IP address/port manually if mDNS fails (with LVGL on-screen keyboard)
+      - If mDNS does not find a server, an IP address and port can be entered manually with the
+        LVGL on-screen keyboard.
  - Connects to WiThrottle server, acquires server info, rosters, etc.
  - Switches to main control screen:
     - Shown: Current loco chosen (with option to choose), speed/dir (functions indicated by LEDs)
