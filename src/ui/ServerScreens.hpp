@@ -22,15 +22,65 @@ namespace ui {
             root = lv_obj_create(nullptr);
             lv_obj_clear_flag(root, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_style_pad_all(root, 0, 0);
+            lv_obj_set_layout(root, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(root, LV_FLEX_FLOW_COLUMN);
+            lv_obj_set_flex_align(
+                root,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
 
-            back_button_ = create_button("Back", 0, 0, 42, back_button_event_callback);
-            scan_button_ = create_button("Scan", 43, 0, 42, scan_button_event_callback);
-            manual_button_ = create_button("Manual", 86, 0, 42, manual_button_event_callback);
+            header_container_ = lv_obj_create(root);
+            lv_obj_set_size(header_container_, 128, 12);
+            lv_obj_set_style_border_width(header_container_, 0, LV_PART_MAIN);
+            lv_obj_set_layout(header_container_, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(header_container_, LV_FLEX_FLOW_ROW);
+            lv_obj_set_flex_align(
+                header_container_,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
+            lv_obj_set_style_pad_column(header_container_, 1, LV_PART_MAIN);
+
+            back_button_ = create_button("Back", 42, back_button_event_callback);
+            scan_button_ = create_button("Scan", 42, scan_button_event_callback);
+            manual_button_ = create_button("Manual", 42, manual_button_event_callback);
 
             list_container_ = lv_obj_create(root);
-            lv_obj_set_pos(list_container_, 0, 12);
-            lv_obj_set_size(list_container_, 128, 52);
+            lv_obj_set_width(list_container_, 128);
+            lv_obj_set_flex_grow(list_container_, 1);
             lv_obj_set_scroll_dir(list_container_, LV_DIR_VER);
+            lv_obj_set_layout(list_container_, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(list_container_, LV_FLEX_FLOW_COLUMN);
+            lv_obj_set_flex_align(
+                list_container_,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
+
+            manual_fields_container_ = lv_obj_create(root);
+            lv_obj_set_size(manual_fields_container_, 128, 18);
+            lv_obj_add_flag(manual_fields_container_, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_style_border_width(manual_fields_container_, 0, LV_PART_MAIN);
+            lv_obj_set_layout(manual_fields_container_, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(manual_fields_container_, LV_FLEX_FLOW_ROW);
+            lv_obj_set_flex_align(
+                manual_fields_container_,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
+            lv_obj_set_style_pad_column(manual_fields_container_, 2, LV_PART_MAIN);
+
+            keyboard_ = lv_keyboard_create(root);
+            lv_obj_set_size(keyboard_, 128, 46);
+            lv_obj_add_flag(keyboard_, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(keyboard_, LV_OBJ_FLAG_IGNORE_LAYOUT);
+            lv_obj_align(keyboard_, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+            lv_obj_set_style_pad_all(keyboard_, 0, 0);
+            lv_obj_set_style_pad_gap(keyboard_, 0, 0);
+            lv_obj_set_style_pad_all(keyboard_, 0, LV_PART_ITEMS);
+            lv_obj_add_event_cb(keyboard_, manual_keyboard_event_callback, LV_EVENT_READY, this);
+            lv_obj_add_event_cb(keyboard_, manual_keyboard_event_callback, LV_EVENT_CANCEL, this);
         }
 
         void on_show() override {
@@ -45,11 +95,10 @@ namespace ui {
                 lv_keyboard_set_textarea(keyboard_, nullptr);
                 lv_obj_add_flag(keyboard_, LV_OBJ_FLAG_HIDDEN);
             }
+            lv_obj_add_flag(manual_fields_container_, LV_OBJ_FLAG_HIDDEN);
             clear_manual_fields();
             lv_obj_clear_flag(list_container_, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(back_button_, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(scan_button_, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(manual_button_, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(header_container_, LV_OBJ_FLAG_HIDDEN);
         }
 
     private:
@@ -60,7 +109,9 @@ namespace ui {
         lv_obj_t* back_button_ = nullptr;
         lv_obj_t* scan_button_ = nullptr;
         lv_obj_t* manual_button_ = nullptr;
+        lv_obj_t* header_container_ = nullptr;
         lv_obj_t* list_container_ = nullptr;
+        lv_obj_t* manual_fields_container_ = nullptr;
         lv_obj_t* keyboard_ = nullptr;
         lv_obj_t* address_textarea_ = nullptr;
         lv_obj_t* port_textarea_ = nullptr;
@@ -75,13 +126,10 @@ namespace ui {
 
         lv_obj_t* create_button(
             const char* text,
-            int32_t x,
-            int32_t y,
             int32_t width,
             button_callback_t callback) {
-            lv_obj_t* button = lv_button_create(root);
+            lv_obj_t* button = lv_button_create(header_container_);
             apply_button_border(button);
-            lv_obj_set_pos(button, x, y);
             lv_obj_set_width(button, width);
             lv_obj_t* label = lv_label_create(button);
             lv_label_set_text(label, text);
@@ -90,10 +138,9 @@ namespace ui {
             return button;
         }
 
-        void add_server_row(const char* text, uint32_t index, button_callback_t callback = nullptr) {
+        void add_server_row(const char* text, button_callback_t callback = nullptr) {
             lv_obj_t* button = lv_button_create(list_container_);
             apply_button_border(button);
-            lv_obj_set_pos(button, 0, static_cast<int32_t>(index * list_row_height));
             lv_obj_set_size(button, 128, list_row_height);
             lv_obj_t* label = lv_label_create(button);
             lv_label_set_text(label, text);
@@ -105,7 +152,7 @@ namespace ui {
 
         void show_discovered_servers() {
             lv_obj_clean(list_container_);
-            add_server_row("Scanning...", 0);
+            add_server_row("Scanning...");
         }
 
         void start_scan() {
@@ -113,7 +160,7 @@ namespace ui {
             lv_obj_clean(list_container_);
             lv_obj_clear_flag(list_container_, LV_OBJ_FLAG_HIDDEN);
             discovery_.begin();
-            add_server_row("Scanning...", 0);
+            add_server_row("Scanning...");
             scan_timer_ = lv_timer_create(scan_timer_callback, scan_timer_period_ms, this);
         }
 
@@ -123,13 +170,12 @@ namespace ui {
             saved_server_available_ = AppState::get_instance().get_saved_server(
                 saved_server_host_, sizeof(saved_server_host_), saved_server_port_);
             if (saved_server_available_) {
-                add_server_row("Saved server", 0, server_button_event_callback);
+                add_server_row("Saved server", server_button_event_callback);
             }
 
             if (servers.empty()) {
-                const uint32_t row_offset = saved_server_available_ ? 1 : 0;
-                add_server_row("No servers found", row_offset);
-                add_server_row("Use Manual", row_offset + 1, manual_button_event_callback);
+                add_server_row("No servers found");
+                add_server_row("Use Manual", manual_button_event_callback);
                 return;
             }
 
@@ -142,10 +188,8 @@ namespace ui {
                     servers[index].name.c_str(),
                     servers[index].ip.toString().c_str(),
                     static_cast<unsigned>(servers[index].port));
-                const uint32_t row_offset = saved_server_available_ ? 1 : 0;
                 add_server_row(
                     text,
-                    static_cast<uint32_t>(index) + row_offset,
                     server_button_event_callback);
             }
         }
@@ -161,35 +205,21 @@ namespace ui {
             stop_scan_timer();
             discovery_.cancel();
             lv_obj_add_flag(list_container_, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(back_button_, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(scan_button_, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(manual_button_, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(header_container_, LV_OBJ_FLAG_HIDDEN);
 
-            address_textarea_ = lv_textarea_create(root);
-            lv_obj_set_pos(address_textarea_, 0, 0);
+            address_textarea_ = lv_textarea_create(manual_fields_container_);
             lv_obj_set_size(address_textarea_, 82, 18);
             lv_textarea_set_one_line(address_textarea_, true);
             lv_textarea_set_placeholder_text(address_textarea_, "IP address");
             lv_obj_add_event_cb(address_textarea_, manual_textarea_event_callback, LV_EVENT_CLICKED, this);
 
-            port_textarea_ = lv_textarea_create(root);
-            lv_obj_set_pos(port_textarea_, 84, 0);
+            port_textarea_ = lv_textarea_create(manual_fields_container_);
             lv_obj_set_size(port_textarea_, 44, 18);
             lv_textarea_set_one_line(port_textarea_, true);
             lv_textarea_set_placeholder_text(port_textarea_, "Port");
             lv_obj_add_event_cb(port_textarea_, manual_textarea_event_callback, LV_EVENT_CLICKED, this);
 
-            if (keyboard_ == nullptr) {
-                keyboard_ = lv_keyboard_create(root);
-                lv_obj_set_align(keyboard_, LV_ALIGN_TOP_LEFT);
-                lv_obj_set_pos(keyboard_, 0, 18);
-                lv_obj_set_size(keyboard_, 128, 46);
-                lv_obj_set_style_pad_all(keyboard_, 0, 0);
-                lv_obj_set_style_pad_gap(keyboard_, 0, 0);
-                lv_obj_set_style_pad_all(keyboard_, 0, LV_PART_ITEMS);
-                lv_obj_add_event_cb(keyboard_, manual_keyboard_event_callback, LV_EVENT_READY, this);
-                lv_obj_add_event_cb(keyboard_, manual_keyboard_event_callback, LV_EVENT_CANCEL, this);
-            }
+            lv_obj_clear_flag(manual_fields_container_, LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(keyboard_, LV_OBJ_FLAG_HIDDEN);
             lv_keyboard_set_textarea(keyboard_, address_textarea_);
         }
@@ -208,10 +238,9 @@ namespace ui {
         void return_to_server_list() {
             lv_keyboard_set_textarea(keyboard_, nullptr);
             lv_obj_add_flag(keyboard_, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(manual_fields_container_, LV_OBJ_FLAG_HIDDEN);
             clear_manual_fields();
-            lv_obj_clear_flag(back_button_, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(scan_button_, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_flag(manual_button_, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(header_container_, LV_OBJ_FLAG_HIDDEN);
             start_scan();
         }
 

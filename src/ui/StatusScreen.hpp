@@ -19,17 +19,37 @@ namespace ui {
 
         void build() override {
             root = lv_obj_create(nullptr);
+            lv_obj_set_layout(root, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(root, LV_FLEX_FLOW_COLUMN);
+            lv_obj_set_flex_align(
+                root,
+                LV_FLEX_ALIGN_SPACE_BETWEEN,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
+            lv_obj_set_style_pad_all(root, 0, LV_PART_MAIN);
+            lv_obj_set_style_pad_bottom(root, 2, LV_PART_MAIN);
 
-            wifi_label_ = create_label("WiFi: Not set", 0);
+            lv_obj_t* status_group = lv_obj_create(root);
+            lv_obj_set_size(status_group, 128, 24);
+            lv_obj_set_style_border_width(status_group, 0, LV_PART_MAIN);
+            lv_obj_set_layout(status_group, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(status_group, LV_FLEX_FLOW_COLUMN);
+            lv_obj_set_flex_align(
+                status_group,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
+            lv_obj_set_style_pad_row(status_group, 8, LV_PART_MAIN);
+
+            wifi_label_ = create_label("WiFi: Not set", status_group);
             lv_obj_add_flag(wifi_label_, LV_OBJ_FLAG_CLICKABLE);
             lv_obj_add_event_cb(wifi_label_, wifi_label_event_callback, LV_EVENT_CLICKED, this);
-            server_label_ = create_label("TCP: Not set", 16);
+            server_label_ = create_label("TCP: Not set", status_group);
             lv_obj_add_flag(server_label_, LV_OBJ_FLAG_CLICKABLE);
             lv_obj_add_event_cb(server_label_, server_label_event_callback, LV_EVENT_CLICKED, this);
 
             control_button_ = lv_btn_create(root);
             apply_button_border(control_button_);
-            lv_obj_set_pos(control_button_, 0, 34);
             lv_obj_set_size(control_button_, 128, 28);
             control_label_ = lv_label_create(control_button_);
             lv_label_set_text(control_label_, "To control");
@@ -80,10 +100,9 @@ namespace ui {
             ScreenManager::instance().set_screen(&screen->server_screen_);
         }
 
-        lv_obj_t* create_label(const char* text, int32_t y) {
-            lv_obj_t* label = lv_label_create(root);
+        lv_obj_t* create_label(const char* text, lv_obj_t* parent) {
+            lv_obj_t* label = lv_label_create(parent);
             lv_label_set_text(label, text);
-            lv_obj_set_pos(label, 0, y);
             return label;
         }
 

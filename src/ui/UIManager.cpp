@@ -15,6 +15,7 @@ namespace ui {
             LV_ASSERT_MALLOC(keyboard_theme);
             lv_style_init(&compact_padding_style);
             lv_style_set_pad_all(&compact_padding_style, 0);
+            lv_style_set_pad_gap(&compact_padding_style, 0);
             lv_style_init(&default_button_style);
             lv_style_set_height(&default_button_style, 12);
             lv_style_init(&keyboard_border_style);
@@ -27,9 +28,7 @@ namespace ui {
         lv_theme_copy(keyboard_theme, theme);
         lv_theme_set_parent(keyboard_theme, theme);
         lv_theme_set_apply_cb(keyboard_theme, [](lv_theme_t*, lv_obj_t* obj) {
-            if (lv_obj_get_parent(obj) != nullptr) {
-                lv_obj_add_style(obj, &compact_padding_style, LV_PART_MAIN);
-            }
+            lv_obj_add_style(obj, &compact_padding_style, LV_PART_MAIN);
             if (lv_obj_check_type(obj, &lv_button_class)) {
                 lv_obj_add_style(obj, &default_button_style, LV_PART_MAIN);
             }

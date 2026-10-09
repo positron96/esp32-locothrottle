@@ -14,17 +14,23 @@ namespace ui {
             root = lv_obj_create(nullptr);
             lv_obj_clear_flag(root, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_style_pad_all(root, 0, 0);
+            lv_obj_set_layout(root, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(root, LV_FLEX_FLOW_COLUMN);
+            lv_obj_set_flex_align(
+                root,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
 
             password_textarea_ = lv_textarea_create(root);
-            lv_obj_set_pos(password_textarea_, 0, 0);
             lv_obj_set_size(password_textarea_, 128, 18);
             lv_textarea_set_password_mode(password_textarea_, true);
             lv_textarea_set_one_line(password_textarea_, true);
 
             keyboard_ = lv_keyboard_create(root);
-            lv_obj_set_align(keyboard_, LV_ALIGN_TOP_LEFT);
-            lv_obj_set_pos(keyboard_, 0, 18);
             lv_obj_set_size(keyboard_, 128, 46);
+            lv_obj_add_flag(keyboard_, LV_OBJ_FLAG_IGNORE_LAYOUT);
+            lv_obj_align(keyboard_, LV_ALIGN_BOTTOM_LEFT, 0, 0);
             lv_obj_set_style_pad_all(keyboard_, 0, 0);
             lv_obj_set_style_pad_gap(keyboard_, 0, 0);
             lv_obj_set_style_pad_all(keyboard_, 0, LV_PART_ITEMS);
@@ -74,10 +80,17 @@ namespace ui {
 
         void build() override {
             root = lv_obj_create(nullptr);
+            lv_obj_set_style_pad_all(root, 0, 0);
+            lv_obj_set_layout(root, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(root, LV_FLEX_FLOW_COLUMN);
+            lv_obj_set_flex_align(
+                root,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
 
             back_button_ = lv_button_create(root);
             apply_button_border(back_button_);
-            lv_obj_set_pos(back_button_, 0, 0);
             lv_obj_set_width(back_button_, 42);
             lv_obj_t* back_label = lv_label_create(back_button_);
             lv_label_set_text(back_label, "Back");
@@ -85,9 +98,16 @@ namespace ui {
             lv_obj_add_event_cb(back_button_, back_button_event_callback, LV_EVENT_CLICKED, this);
 
             network_container_ = lv_obj_create(root);
-            lv_obj_set_pos(network_container_, 0, 12);
-            lv_obj_set_size(network_container_, 128, 52);
+            lv_obj_set_width(network_container_, 128);
+            lv_obj_set_flex_grow(network_container_, 1);
             lv_obj_set_scroll_dir(network_container_, LV_DIR_VER);
+            lv_obj_set_layout(network_container_, LV_LAYOUT_FLEX);
+            lv_obj_set_flex_flow(network_container_, LV_FLEX_FLOW_COLUMN);
+            lv_obj_set_flex_align(
+                network_container_,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START,
+                LV_FLEX_ALIGN_START);
         }
 
         void on_show() override {
@@ -107,8 +127,6 @@ namespace ui {
         lv_obj_t* back_button_ = nullptr;
         lv_obj_t* network_container_ = nullptr;
         lv_timer_t* scan_timer_ = nullptr;
-        uint32_t network_row_count_ = 0;
-
         static void back_button_event_callback(lv_event_t* event) {
             if (lv_event_get_code(event) != LV_EVENT_CLICKED) {
                 return;
@@ -162,7 +180,6 @@ namespace ui {
 
         void clear_network_list() {
             lv_obj_clean(network_container_);
-            network_row_count_ = 0;
         }
 
         void stop_scan_timer() {
@@ -175,16 +192,11 @@ namespace ui {
         void add_network_row(const char* network_name) {
             lv_obj_t* network_button = lv_btn_create(network_container_);
             apply_button_border(network_button);
-            lv_obj_set_pos(
-                network_button,
-                0,
-                static_cast<int32_t>(network_row_count_ * network_row_height));
             lv_obj_set_size(network_button, 128, network_row_height);
             lv_obj_t* network_label = lv_label_create(network_button);
             lv_label_set_text(network_label, network_name);
             lv_obj_center(network_label);
             lv_obj_add_event_cb(network_button, network_button_event_callback, LV_EVENT_CLICKED, this);
-            ++network_row_count_;
         }
 
         static void network_button_event_callback(lv_event_t* event) {

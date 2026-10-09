@@ -875,7 +875,7 @@
  *============================================================================*/
 
 /** Arrange children in a row or column that wraps and grows, similar to Flexbox in CSS. */
-#define LV_USE_FLEX 0
+#define LV_USE_FLEX 1
 
 /** Arrange children in rows and columns, similar to Grid in CSS. */
 #define LV_USE_GRID 0
