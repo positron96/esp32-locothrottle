@@ -19,48 +19,25 @@ namespace ui {
 
         void build() override {
             root = lv_obj_create(nullptr);
+            lv_obj_clear_flag(root, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_layout(root, LV_LAYOUT_FLEX);
             lv_obj_set_flex_flow(root, LV_FLEX_FLOW_COLUMN);
             lv_obj_set_flex_align(
                 root,
-                LV_FLEX_ALIGN_SPACE_BETWEEN,
+                LV_FLEX_ALIGN_START,
                 LV_FLEX_ALIGN_START,
                 LV_FLEX_ALIGN_START);
             lv_obj_set_style_pad_all(root, 0, LV_PART_MAIN);
-            lv_obj_set_style_pad_bottom(root, 2, LV_PART_MAIN);
+            lv_obj_set_style_border_width(root, 0, LV_PART_MAIN);
 
-            lv_obj_t* status_group = lv_obj_create(root);
-            lv_obj_set_size(status_group, 128, 24);
-            lv_obj_set_style_border_width(status_group, 0, LV_PART_MAIN);
-            lv_obj_set_layout(status_group, LV_LAYOUT_FLEX);
-            lv_obj_set_flex_flow(status_group, LV_FLEX_FLOW_COLUMN);
-            lv_obj_set_flex_align(
-                status_group,
-                LV_FLEX_ALIGN_START,
-                LV_FLEX_ALIGN_START,
-                LV_FLEX_ALIGN_START);
-            lv_obj_set_style_pad_row(status_group, 8, LV_PART_MAIN);
-
-            wifi_label_ = create_label("WiFi: Not set", status_group);
-            lv_obj_add_flag(wifi_label_, LV_OBJ_FLAG_CLICKABLE);
-            add_focusable(wifi_label_);
-            lv_obj_add_event_cb(wifi_label_, wifi_label_event_callback, LV_EVENT_CLICKED, this);
-            server_label_ = create_label("TCP: Not set", status_group);
-            lv_obj_add_flag(server_label_, LV_OBJ_FLAG_CLICKABLE);
-            add_focusable(server_label_);
-            lv_obj_add_event_cb(server_label_, server_label_event_callback, LV_EVENT_CLICKED, this);
-
-            control_button_ = lv_btn_create(root);
-            apply_button_border(control_button_);
-            lv_obj_set_size(control_button_, 128, 28);
-            control_label_ = lv_label_create(control_button_);
-            lv_label_set_text(control_label_, "To control");
-            lv_obj_center(control_label_);
-            add_focusable(control_button_);
+            wifi_row_ = create_list_item("WiFi: Not set", wifi_label_);
+            lv_obj_add_event_cb(wifi_row_, wifi_label_event_callback, LV_EVENT_CLICKED, this);
+            server_row_ = create_list_item("TCP: Not set", server_label_);
+            lv_obj_add_event_cb(server_row_, server_label_event_callback, LV_EVENT_CLICKED, this);
+            control_row_ = create_list_item("To control", control_label_);
 
             refresh_status();
             refresh_timer_ = lv_timer_create(refresh_timer_callback, status_timer_period_ms, this);
-
         };
 
         void on_show() override {
@@ -77,9 +54,11 @@ namespace ui {
     private:
         static constexpr uint32_t status_timer_period_ms = 200;
 
+        lv_obj_t* wifi_row_ = nullptr;
         lv_obj_t* wifi_label_ = nullptr;
+        lv_obj_t* server_row_ = nullptr;
         lv_obj_t* server_label_ = nullptr;
-        lv_obj_t* control_button_ = nullptr;
+        lv_obj_t* control_row_ = nullptr;
         lv_obj_t* control_label_ = nullptr;
         lv_timer_t* refresh_timer_ = nullptr;
         WiFiSelectionScreen wifi_selection_screen_;
@@ -103,10 +82,21 @@ namespace ui {
             ScreenManager::instance().set_screen(&screen->server_screen_);
         }
 
-        lv_obj_t* create_label(const char* text, lv_obj_t* parent) {
-            lv_obj_t* label = lv_label_create(parent);
+        lv_obj_t* create_list_item(const char* text, lv_obj_t*& label) {
+            lv_obj_t* row = lv_btn_create(root);
+            lv_obj_set_width(row, LV_PCT(100));
+            lv_obj_set_height(row, 0);
+            lv_obj_set_flex_grow(row, 1);
+            lv_obj_set_style_radius(row, 0, LV_PART_MAIN);
+            lv_obj_set_style_border_width(row, 0, LV_PART_MAIN);
+            lv_obj_set_style_pad_hor(row, 3, LV_PART_MAIN);
+            lv_obj_set_style_pad_ver(row, 0, LV_PART_MAIN);
+
+            label = lv_label_create(row);
             lv_label_set_text(label, text);
-            return label;
+            lv_obj_center(label);
+            add_focusable(row);
+            return row;
         }
 
         static void refresh_timer_callback(lv_timer_t* timer) {

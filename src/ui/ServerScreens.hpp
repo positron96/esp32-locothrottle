@@ -42,9 +42,9 @@ namespace ui {
                 LV_FLEX_ALIGN_START);
             lv_obj_set_style_pad_column(header_container_, 1, LV_PART_MAIN);
 
-            back_button_ = create_button("Back", 42, back_button_event_callback);
-            scan_button_ = create_button("Scan", 42, scan_button_event_callback);
-            manual_button_ = create_button("Manual", 42, manual_button_event_callback);
+            back_button_ = create_button("Back", 40, back_button_event_callback);
+            scan_button_ = create_button("Scan", 40, scan_button_event_callback);
+            manual_button_ = create_button("Manual", 40, manual_button_event_callback);
 
             list_container_ = lv_obj_create(root);
             lv_obj_set_width(list_container_, 128);
@@ -132,7 +132,8 @@ namespace ui {
         lv_obj_t* create_button(
             const char* text,
             int32_t width,
-            button_callback_t callback) {
+            button_callback_t callback
+        ) {
             lv_obj_t* button = lv_button_create(header_container_);
             apply_button_border(button);
             lv_obj_set_width(button, width);
