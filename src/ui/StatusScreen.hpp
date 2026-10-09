@@ -43,9 +43,11 @@ namespace ui {
 
             wifi_label_ = create_label("WiFi: Not set", status_group);
             lv_obj_add_flag(wifi_label_, LV_OBJ_FLAG_CLICKABLE);
+            add_focusable(wifi_label_);
             lv_obj_add_event_cb(wifi_label_, wifi_label_event_callback, LV_EVENT_CLICKED, this);
             server_label_ = create_label("TCP: Not set", status_group);
             lv_obj_add_flag(server_label_, LV_OBJ_FLAG_CLICKABLE);
+            add_focusable(server_label_);
             lv_obj_add_event_cb(server_label_, server_label_event_callback, LV_EVENT_CLICKED, this);
 
             control_button_ = lv_btn_create(root);
@@ -54,6 +56,7 @@ namespace ui {
             control_label_ = lv_label_create(control_button_);
             lv_label_set_text(control_label_, "To control");
             lv_obj_center(control_label_);
+            add_focusable(control_button_);
 
             refresh_status();
             refresh_timer_ = lv_timer_create(refresh_timer_callback, status_timer_period_ms, this);

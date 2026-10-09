@@ -92,6 +92,10 @@ namespace ui {
             stop_scan_timer();
             discovery_.cancel();
             if (keyboard_ != nullptr) {
+                if (keyboard_in_group_) {
+                    lv_group_remove_obj(keyboard_);
+                    keyboard_in_group_ = false;
+                }
                 lv_keyboard_set_textarea(keyboard_, nullptr);
                 lv_obj_add_flag(keyboard_, LV_OBJ_FLAG_HIDDEN);
             }
@@ -119,6 +123,7 @@ namespace ui {
         char saved_server_host_[64] = {};
         uint16_t saved_server_port_ = 0;
         bool saved_server_available_ = false;
+        bool keyboard_in_group_ = false;
 
         ServerDiscovery discovery_;
 
@@ -134,6 +139,7 @@ namespace ui {
             lv_obj_t* label = lv_label_create(button);
             lv_label_set_text(label, text);
             lv_obj_center(label);
+            add_focusable(button);
             lv_obj_add_event_cb(button, callback, LV_EVENT_CLICKED, this);
             return button;
         }
@@ -146,6 +152,7 @@ namespace ui {
             lv_label_set_text(label, text);
             lv_obj_center(label);
             if (callback != nullptr) {
+                add_focusable(button);
                 lv_obj_add_event_cb(button, callback, LV_EVENT_CLICKED, this);
             }
         }
@@ -208,12 +215,14 @@ namespace ui {
             lv_obj_add_flag(header_container_, LV_OBJ_FLAG_HIDDEN);
 
             address_textarea_ = lv_textarea_create(manual_fields_container_);
+            add_focusable(address_textarea_);
             lv_obj_set_size(address_textarea_, 82, 18);
             lv_textarea_set_one_line(address_textarea_, true);
             lv_textarea_set_placeholder_text(address_textarea_, "IP address");
             lv_obj_add_event_cb(address_textarea_, manual_textarea_event_callback, LV_EVENT_CLICKED, this);
 
             port_textarea_ = lv_textarea_create(manual_fields_container_);
+            add_focusable(port_textarea_);
             lv_obj_set_size(port_textarea_, 44, 18);
             lv_textarea_set_one_line(port_textarea_, true);
             lv_textarea_set_placeholder_text(port_textarea_, "Port");
@@ -221,7 +230,10 @@ namespace ui {
 
             lv_obj_clear_flag(manual_fields_container_, LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(keyboard_, LV_OBJ_FLAG_HIDDEN);
+            add_focusable(keyboard_, false);
+            keyboard_in_group_ = true;
             lv_keyboard_set_textarea(keyboard_, address_textarea_);
+            lv_group_focus_obj(address_textarea_);
         }
 
         void clear_manual_fields() {
@@ -236,6 +248,10 @@ namespace ui {
         }
 
         void return_to_server_list() {
+            if (keyboard_in_group_) {
+                lv_group_remove_obj(keyboard_);
+                keyboard_in_group_ = false;
+            }
             lv_keyboard_set_textarea(keyboard_, nullptr);
             lv_obj_add_flag(keyboard_, LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(manual_fields_container_, LV_OBJ_FLAG_HIDDEN);

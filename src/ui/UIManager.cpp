@@ -22,7 +22,10 @@ namespace ui {
             lv_style_set_border_width(&keyboard_border_style, 1);
             lv_style_set_border_color(&keyboard_border_style, lv_color_white());
             lv_style_set_border_opa(&keyboard_border_style, LV_OPA_COVER);
-            lv_style_set_border_side(&keyboard_border_style, LV_BORDER_SIDE_FULL);
+            lv_style_set_border_side(
+                &keyboard_border_style,
+                static_cast<lv_border_side_t>(
+                    LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_RIGHT));
             lv_style_set_radius(&keyboard_border_style, 0);
         }
         lv_theme_copy(keyboard_theme, theme);
@@ -53,6 +56,13 @@ namespace ui {
         if (current_screen) {
             if(current_screen->root == nullptr)
                 current_screen->build();
+            lv_group_t* group = current_screen->focus_group();
+            for (lv_indev_t* indev = lv_indev_get_next(nullptr); indev != nullptr;
+                 indev = lv_indev_get_next(indev)) {
+                if (lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+                    lv_indev_set_group(indev, group);
+                }
+            }
             lv_scr_load(current_screen->root);
             current_screen->on_show();
         } else {

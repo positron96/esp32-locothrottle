@@ -23,11 +23,13 @@ namespace ui {
                 LV_FLEX_ALIGN_START);
 
             password_textarea_ = lv_textarea_create(root);
+            add_focusable(password_textarea_);
             lv_obj_set_size(password_textarea_, 128, 18);
             lv_textarea_set_password_mode(password_textarea_, true);
             lv_textarea_set_one_line(password_textarea_, true);
 
             keyboard_ = lv_keyboard_create(root);
+            add_focusable(keyboard_, false);
             lv_obj_set_size(keyboard_, 128, 46);
             lv_obj_add_flag(keyboard_, LV_OBJ_FLAG_IGNORE_LAYOUT);
             lv_obj_align(keyboard_, LV_ALIGN_BOTTOM_LEFT, 0, 0);
@@ -95,6 +97,7 @@ namespace ui {
             lv_obj_t* back_label = lv_label_create(back_button_);
             lv_label_set_text(back_label, "Back");
             lv_obj_center(back_label);
+            add_focusable(back_button_);
             lv_obj_add_event_cb(back_button_, back_button_event_callback, LV_EVENT_CLICKED, this);
 
             network_container_ = lv_obj_create(root);
@@ -196,6 +199,7 @@ namespace ui {
             lv_obj_t* network_label = lv_label_create(network_button);
             lv_label_set_text(network_label, network_name);
             lv_obj_center(network_label);
+            add_focusable(network_button);
             lv_obj_add_event_cb(network_button, network_button_event_callback, LV_EVENT_CLICKED, this);
         }
 
