@@ -1,6 +1,7 @@
 #include <windows.h>
 
 #include <lvgl.h>
+#include <src/drivers/windows/lv_windows_input.h>
 
 #include "ui/StatusScreen.hpp"
 
@@ -11,23 +12,22 @@ constexpr int32_t DISPLAY_VER_RES = WTH_DISPLAY_VER_RES;
 
 void initDisplay() {
     lv_init();
-    lv_windows_create_display(
+    lv_display_t* display = lv_windows_create_display(
         L"WiThRemote",
         DISPLAY_HOR_RES,
         DISPLAY_VER_RES,
         500,
         false,
         true);
-
-    lv_theme_t * mono = lv_theme_mono_init(lv_disp_get_default(), /*dark_bg=*/true, LV_FONT_DEFAULT);
-    lv_disp_set_theme(lv_disp_get_default(), mono);
-
+    lv_windows_acquire_pointer_indev(display);
+    lv_windows_acquire_encoder_indev(display);
 }
 
 } // namespace
 
 int main() {
     initDisplay();
+    ui::ScreenManager::instance().init();
 
     ui::StatusScreen status_screen;
     ui::ScreenManager::instance().set_screen(&status_screen);
