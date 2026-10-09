@@ -2,6 +2,7 @@
 
 #include "UIManager.hpp"
 #include "../AppState.h"
+#include "ControlLocoScreen.hpp"
 #include "ServerScreens.hpp"
 #include "WiFiScreens.hpp"
 #include <WiFi.h>
@@ -11,7 +12,7 @@ namespace ui {
     class StatusScreen : public Screen {
     public:
         StatusScreen()
-            : wifi_selection_screen_(this), server_screen_(this) {}
+            : wifi_selection_screen_(this), server_screen_(this), control_screen_(this) {}
 
         ~StatusScreen() override {
             stop_refresh_timer();
@@ -35,6 +36,7 @@ namespace ui {
             server_row_ = create_list_item("TCP: Not set", server_label_);
             lv_obj_add_event_cb(server_row_, server_label_event_callback, LV_EVENT_CLICKED, this);
             control_row_ = create_list_item("To control", control_label_);
+            lv_obj_add_event_cb(control_row_, control_label_event_callback, LV_EVENT_CLICKED, this);
 
             refresh_status();
             refresh_timer_ = lv_timer_create(refresh_timer_callback, status_timer_period_ms, this);
@@ -63,6 +65,7 @@ namespace ui {
         lv_timer_t* refresh_timer_ = nullptr;
         WiFiSelectionScreen wifi_selection_screen_;
         ServerScreen server_screen_;
+        ControlLocoScreen control_screen_;
 
         static void wifi_label_event_callback(lv_event_t* event) {
             if (lv_event_get_code(event) != LV_EVENT_CLICKED) {
@@ -80,6 +83,15 @@ namespace ui {
 
             auto* screen = static_cast<StatusScreen*>(lv_event_get_user_data(event));
             ScreenManager::instance().set_screen(&screen->server_screen_);
+        }
+
+        static void control_label_event_callback(lv_event_t* event) {
+            if (lv_event_get_code(event) != LV_EVENT_CLICKED) {
+                return;
+            }
+
+            auto* screen = static_cast<StatusScreen*>(lv_event_get_user_data(event));
+            ScreenManager::instance().set_screen(&screen->control_screen_);
         }
 
         lv_obj_t* create_list_item(const char* text, lv_obj_t*& label) {

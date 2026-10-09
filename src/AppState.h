@@ -2,14 +2,31 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
+#include <etl/bitset.h>
 #include <Preferences.h>
 #include <WiFiClient.h>
+#include "inputs/ThrottleInputs.h"
+
+struct Loco {
+    uint16_t addr = 0;
+    uint8_t speed = 0;
+    ThrottleDirection dir = ThrottleDirection::Neutral;
+    etl::bitset<16> fns;
+};
 
 class AppState {
 
 public:
+    AppState() {
+        for (size_t index = 0; index < loco.fns.size(); ++index) {
+            loco.fns[index] = (std::rand() & 1) != 0;
+        }
+    }
+
+    Loco loco;
     bool is_connected = false;
     char server_host[64] = {};
     uint16_t server_port = 0;
