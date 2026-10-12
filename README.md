@@ -43,3 +43,16 @@ Implementation details:
 - Buttons are debounced, potentiometers are calibrated, and commands are sent
   only when values change significantly.
 - ETL library is used for containers, algorithms etc.
+
+### Keypad
+
+`Keypad` in [src/inputs/ButtonInputs.h](src/inputs/ButtonInputs.h) uses the
+TCA9535 to read 8 buttons and control 8 LEDs.
+It is independent of LVGL.
+
+It's designed to be used with "Function Keypad" PCB (link to be added).
+The schematic mapping is LED0-LED7 to P13-P10, P07-P04,
+and BUTTON0-BUTTON7 to P14-P17, P03-P00.
+LEDs are active-high, buttons switch to ground and require external pull-ups
+  (the TCA9535 has no internal pull-ups)
+No button debouncing is performed at the moment.
